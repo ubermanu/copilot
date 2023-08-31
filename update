@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Check if curl, unzip, and rsync commands exist
+command -v curl >/dev/null 2>&1 || { echo >&2 "curl is required but not installed. Aborting."; exit 1; }
+command -v unzip >/dev/null 2>&1 || { echo >&2 "unzip is required but not installed. Aborting."; exit 1; }
+command -v rsync >/dev/null 2>&1 || { echo >&2 "rsync is required but not installed. Aborting."; exit 1; }
+
+# Define archive URL and folder path
+ARCHIVE_URL="https://github.com/github/copilot.vim/archive/refs/heads/release.zip"
+FOLDER_NAME="copilot.vim-release"
+
+# Create a temporary directory to download the archive
+TEMP_DIR=$(mktemp -d)
+ARCHIVE_NAME="release.zip"
+
+# Download the archive
+curl -L -s -o "$TEMP_DIR/$ARCHIVE_NAME" "$ARCHIVE_URL"
+
+# Extract the downloaded archive in the current working directory
+unzip -q "$TEMP_DIR/$ARCHIVE_NAME" -d "$TEMP_DIR"
+rsync -a "$TEMP_DIR/$FOLDER_NAME/dist" .
+
+# Clean up the temporary directory
+rm -rf "$TEMP_DIR"
+
+echo "Copilot has been updated to the latest version."
